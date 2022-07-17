@@ -4,7 +4,7 @@ import cv2 as cv
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 
-import config.py # contains spotify client ID, client secret keys
+from config import * # contains spotify client ID, client secret keys
 
 scope = "user-read-currently-playing"
 
