@@ -5,4 +5,3 @@
 > source venv/bin/activate
 2. Run python script
 > python src/main.py
-rpi changes
