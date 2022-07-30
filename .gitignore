@@ -1,0 +1,6 @@
+# config files
+app/config.js
+
+# modules
+app/node_modules
+server/node_modules
