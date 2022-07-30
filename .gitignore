@@ -1,6 +1,4 @@
-# config files
+# do not add these files to GitHub
+.gitignore
 app/config.js
-
-# modules
-app/node_modules
-server/node_modules
+node_modules/
