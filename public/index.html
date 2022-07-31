@@ -7,10 +7,20 @@
     <title>Spotipi</title>
 </head>
 <body>
-    <p>Hello world!</p>
     <script src="/socket.io/socket.io.js"></script>
     <script>
         var socket = io();
     </script>
+    
+    <p>Status:</p>
+    <div id="status"></div>
+
+    <p>Currently playing song:</p>
+    <button onclick="currentlyPlaying()">Refresh</button>
+    <div>
+        <img id="albumImage" src="">
+        <div id="trackTitle"></div>
+        <div id="trackArtist"></div>
+    </div>
 </body>
 </html>

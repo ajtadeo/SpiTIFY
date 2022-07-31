@@ -1,4 +1,4 @@
 # do not add these files to GitHub
 .gitignore
-app/config.js
 node_modules/
+.env
