@@ -1,6 +1,6 @@
 {
   "devDependencies": {
-    "nodemon": "^2.0.19"
+    "nodemon": "^2.0.20"
   },
   "scripts": {
     "start": "nodemon app.js"
@@ -40,7 +40,7 @@
     "request": "^2.88.2",
     "semver": "^5.7.1",
     "simple-update-notifier": "^1.0.7",
-    "socket.io": "^4.5.1",
+    "socket.io": "^4.5.4",
     "supports-color": "^5.5.0",
     "to-regex-range": "^5.0.1",
     "touch": "^3.1.0",

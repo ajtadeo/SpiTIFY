@@ -2,26 +2,30 @@ const { assert } = require("console");
 const express = require("express");
 const http = require("http");
 const { Server } = require("socket.io");
-require("dotenv").config();
+const dotenv = require("dotenv")
 var cookieParser = require('cookie-parser');
 var request = require('request');
 const { access } = require("fs");
+
+/* dotenv setup */
+const result = dotenv.config();
+assert(!result.error, "Spotipi: Error: dotenv not configured correctly.")
+
+const port = process.env.PORT;
+assert(port, "Spotipi: Error: PORT environment variable is required.");
+const hostname = process.env.HOSTNAME;
+assert(hostname, "Spotipi: Error: HOSTNAME environment variable is required.");
+const client_id = process.env.SPOTIFY_CLIENT_ID;
+assert(client_id, "Spotipi: Error: SPOTIFY_CLIENT_ID environment variable is required.");
+const redirect_uri = process.env.SPOTIFY_REDIRECT_URI;
+assert(redirect_uri, "Spotipi: Error: SPOTIFY_REDIRECT_URI environment variable is required.");
+const client_secret = process.env.SPOTIFY_CLIENT_SECRET;
+assert(client_secret, "Spotipi: Error: SPOTIFY_CLIENT_SECRET environment variable is required.");
 
 /* Express.js and socket.io setup */
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
-const port = process.env.PORT;
-const hostname = process.env.HOSTNAME;
-const client_id = process.env.CLIENT_ID;
-const redirect_uri = process.env.REDIRECT_URI;
-const client_secret = process.env.CLIENT_SECRET;
-
-assert(port, "PORT environment variable is required.");
-assert(hostname, "HOSTNAME environment variable is required.");
-assert(client_id, "CLIENT_ID environment variable is required.");
-assert(redirect_uri, "REDIRECT_URI environment variable is required.");
-assert(client_secret, "CLIENT_SECRET environment variable is required.");
 
 /* Cookie methods */
 var generateRandomString = function (length) {
@@ -140,8 +144,14 @@ app.get("/refresh_token", (req, res) => {
 /* Server connection */
 io.on("connection", (socket) => {
     console.log(`User connected`);
+}).on("error", (err) => {
+    console.log("Spotipi: Error: socket.io error, Raspberry Pi not turned on or connected to internet.")
+    console.log(err);
 });
 
 server.listen(port, hostname, () => {
     console.log(`App running on ${hostname}:${port}`);
+}).on("error", (err) => {
+    console.log("Spotipi: Error: Express error, Raspberry Pi not turned on or connected to internet.")
+    console.log(err);
 });
