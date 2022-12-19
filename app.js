@@ -7,24 +7,27 @@ var cookieParser = require('cookie-parser');
 var request = require('request');
 const { access } = require("fs");
 
+// https://stackoverflow.com/questions/68329418/in-javascript-how-can-i-throw-an-error-if-an-environmental-variable-is-missing
+function getEnv(name){
+    let val = process.env[name];
+    if ((val === undefined) || (val === null)) {
+        throw ("Spotipi: Error: Missing "+ name +" in ./.env");
+    }
+    return val;
+}
+
 /* dotenv setup */
 const result = dotenv.config();
 if (result.error){
     console.log("Spotipi: Error: dotenv not configured correctly.")
     throw result.error;
 }
-// assert(!result.error, "Spotipi: Error: dotenv not configured correctly.")
 
-const port = process.env.PORT;
-assert(port, "Spotipi: Error: PORT environment variable is required.");
-const hostname = process.env.HOSTNAME;
-assert(hostname, "Spotipi: Error: HOSTNAME environment variable is required.");
-const client_id = process.env.SPOTIFY_CLIENT_ID;
-assert(client_id, "Spotipi: Error: SPOTIFY_CLIENT_ID environment variable is required.");
-const redirect_uri = process.env.SPOTIFY_REDIRECT_URI;
-assert(redirect_uri, "Spotipi: Error: SPOTIFY_REDIRECT_URI environment variable is required.");
-const client_secret = process.env.SPOTIFY_CLIENT_SECRET;
-assert(client_secret, "Spotipi: Error: SPOTIFY_CLIENT_SECRET environment variable is required.");
+const port = getEnv("PORT");
+const hostname = getEnv("HOSTNAME");
+const client_id = getEnv("SPOTIFY_CLIENT_ID");
+const redirect_uri = getEnv("SPOTIFY_REDIRECT_URI");
+const client_secret = getEnv("SPOTIFY_CLIENT_SECRET");
 
 /* Express.js and socket.io setup */
 const app = express();
@@ -156,6 +159,6 @@ io.on("connection", (socket) => {
 server.listen(port, hostname, () => {
     console.log(`App running on ${hostname}:${port}`);
 }).on("error", (err) => {
-    console.log("Spotipi: Error: Express error, Raspberry Pi not turned on or connected to internet.")
+    console.log("Spotipi: Error: Express server not configured correctly.")
     console.log(err);
 });
