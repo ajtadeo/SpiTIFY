@@ -9,7 +9,11 @@ const { access } = require("fs");
 
 /* dotenv setup */
 const result = dotenv.config();
-assert(!result.error, "Spotipi: Error: dotenv not configured correctly.")
+if (result.error){
+    console.log("Spotipi: Error: dotenv not configured correctly.")
+    throw result.error;
+}
+// assert(!result.error, "Spotipi: Error: dotenv not configured correctly.")
 
 const port = process.env.PORT;
 assert(port, "Spotipi: Error: PORT environment variable is required.");
