@@ -7,7 +7,7 @@ This program uses Spotify API and websockets to control Raspberry Pi and display
 4. Set the redirect URI to http://[HOSTNAME]:[PORT]/callback/
 
 ## Express Server Setup on Raspberry Pi
-1. `ssh pi@[hostname]:[port]`
+1. `ssh pi@[HOSTNAME]:[PORT]`
 2. `git clone https://github.com/ajtadeo/Spotipi.git`
 2. `cd Spotipi`
 3. `npm i`
