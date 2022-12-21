@@ -4,7 +4,7 @@ This program uses Spotify API and websockets to control Raspberry Pi and display
 1. Login to https://developer.spotify.com/
 2. Create the Spotipi app
 3. Note the app Client ID and Client Secret
-4. Set the redirect URI to http://[HOSTNAME]:[PORT]/callback/
+4. Set the redirect URI to `http://[HOSTNAME]:[PORT]/`
 
 ## Express Server Setup
 1. `ssh pi@[HOSTNAME]:[PORT]`
@@ -37,3 +37,4 @@ Note: HOSTNAME should not contain "http://"
 
 ## Resources
 https://dev.to/bogdaaamn/run-your-nodejs-application-on-a-headless-raspberry-pi-4jnn
+https://dordnung.de/raspberrypi-ledstrip/
