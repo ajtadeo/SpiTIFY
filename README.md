@@ -26,7 +26,7 @@ Note: HOSTNAME should not contain "http://"
 ## Debugging
 1. `ssh pi@[HOSTNAME]:[PORT]`
 1. `cd Spotipi`
-2. 'npm start`
+2. `npm start`
 
 ## Running
 1. `ssh pi@[HOSTNAME]:[PORT]`
