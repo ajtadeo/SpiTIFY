@@ -6,7 +6,7 @@ This program uses Spotify API and websockets to control Raspberry Pi and display
 3. Note the app Client ID and Client Secret
 4. Set the redirect URI to http://[HOSTNAME]:[PORT]/callback/
 
-## Express Server Setup on Raspberry Pi
+## Express Server Setup
 1. `ssh pi@[HOSTNAME]:[PORT]`
 2. `git clone https://github.com/ajtadeo/Spotipi.git`
 2. `cd Spotipi`
@@ -23,11 +23,17 @@ SPOTIFY_REDIRECT_URI /* http://[HOSTNAME]:[PORT]/callback/ */
 
 Note: HOSTNAME should not contain "http://"
 
-3. `pm2 start app.js`
+## Debugging
+1. `ssh pi@[HOSTNAME]:[PORT]`
+1. `cd Spotipi`
+2. 'npm start`
 
-## Running the App
-1. Open `[HOSTNAME]:[PORT]` in a web browser
-2. Login with Spotify Credentials
+## Running
+1. `ssh pi@[HOSTNAME]:[PORT]`
+1. `cd Spotipi`
+2. `pm2 start app.js`
+3. Open `[HOSTNAME]:[PORT]` in a web browser
+4. Login with Spotify Credentials
 
 ## Resources
 https://dev.to/bogdaaamn/run-your-nodejs-application-on-a-headless-raspberry-pi-4jnn
