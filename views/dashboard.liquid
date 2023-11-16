@@ -1,0 +1,9 @@
+{% layout "index.liquid" %}
+{% block content %}
+  <h1>Dashboard</h1>
+  {% if error %}
+    <p>{{error}}</p>
+  {% else %}
+    <img src="{{current_image_url}}" width="400px" height="400px">
+  {% endif %}
+{% endblock %}

@@ -23,7 +23,7 @@ SPOTIFY_REDIRECT_URI /* http://[HOSTNAME]:[PORT]/callback/ */
 
 Note: HOSTNAME should not contain "http://"
 
-3. `pm2 start app.js`
+3. `npm start app.js`
 
 ## Running the App
 1. Open `[HOSTNAME]:[PORT]` in a web browser

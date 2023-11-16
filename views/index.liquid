@@ -11,8 +11,10 @@
     <script>
         var socket = io();
     </script>
+
+    {% block content %}Default{% endblock %}
     
-    <p>Status:</p>
+    <!-- <p>Status:</p>
     <div id="status"></div>
 
     <p>Currently playing song:</p>
@@ -21,6 +23,6 @@
         <img id="albumImage" src="">
         <div id="trackTitle"></div>
         <div id="trackArtist"></div>
-    </div>
+    </div> -->
 </body>
 </html>
