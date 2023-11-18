@@ -53,18 +53,24 @@ app.get("/dashboard", (req, res) => {
         request.get(currently_playing_params, (error, response, body) => {
             if (response.statusCode == 200) {
                 // music currently playing
-                var current_image_url = body.item.album.images[0].url;
-                var current_progress = body.progress_ms;
-                var current_duration = body.item.duration_ms;
-                var next_refresh = current_duration - current_progress;
-                console.log(current_image_url, next_refresh)
+                var albumURL = body.item.album.images[0].url;
+                var title = body.item.name;
+                var artists = body.item.artists.map((artist) => artist.name).join(', ')
+                var progress = body.progress_ms;
+                var duration = body.item.duration_ms;
+                var nextRefresh = duration - progress;
                 res.render('dashboard', {
-                    current_image_url: current_image_url
+                    user: req.cookies['user'],
+                    title: title,
+                    artists: artists,
+                    albumURL: albumURL
                 });
             } else if (response.statusCode == 204) {
                 // no music currently playing
                 res.render('dashboard', {
-                    error: "Play some music to start!"
+                    user: req.cookies['user'],
+                    error: "error",
+                    errorMessage: "Play some music to start!"
                 })
             } else if (response.statusCode == 401) {
                 // bad or expired token
@@ -72,6 +78,7 @@ app.get("/dashboard", (req, res) => {
             } else {
                 // invalid HTTP code received
                 res.render('dashboard', {
+                    user: req.cookies['user'],
                     error: response.statusCode + ": " + response.body 
                 });
             }
@@ -85,7 +92,7 @@ app.get("/dashboard", (req, res) => {
 app.get("/login", (req, res) => {
     var state = generateRandomString(16);
     res.cookie(stateKey, state);
-    var scope = "user-read-currently-playing";
+    var scope = "user-read-currently-playing user-read-private user-read-email";
     var params = new URLSearchParams({
         'response_type': 'code',
         'client_id': client_id,
@@ -132,8 +139,24 @@ app.get("/callback", (req, res) => {
                 res.cookie("access_token", body.access_token, cookieAttributes)
                 res.cookie("refresh_token", body.refresh_token, cookieAttributes);
 
-                // redirect to dashboard page
-                res.redirect('/dashboard');
+                // username request
+                var userOptions = {
+                    url: 'https://api.spotify.com/v1/me',
+                    headers: { 'Authorization': 'Bearer ' + body.access_token },
+                    json: true
+                };
+
+                request.get(userOptions, (error, response, body) => {
+                    if (!error && response.statusCode == 200) {
+                        // store username in cookie
+                        res.cookie("user", body.display_name)
+                        res.redirect('/dashboard');
+                    } else {
+                        console.log(response.statusCode + ": " + body )
+                        var params = new URLSearchParams({ "error": "could not fetch username" });
+                        res.redirect('/#?' + params.toString());
+                    }
+                })
             } else {
                 var params = new URLSearchParams({ "error": "invalid_token" });
                 res.redirect('/#?' + params.toString());
@@ -145,7 +168,6 @@ app.get("/callback", (req, res) => {
 // refresh access token
 app.get("/refresh_token", (req, res) => {
     var next = req.query.next
-    console.log(next)
     var refresh_token = req.cookies['refresh_token']
     var authOptions = {
         url: 'https://accounts.spotify.com/api/token',
