@@ -39,9 +39,7 @@ h4 {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: 40px;
-  /* padding: 0px 70px; */
-  
+  gap: 40px;  
 }
 
 .left-curve {
@@ -90,6 +88,8 @@ button {
 
   .player-albumart {
     border-radius: 10px;
+    width: 363px;
+    height: auto;
   }
 }
 
