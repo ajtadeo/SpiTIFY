@@ -2,7 +2,10 @@
 
 {% block leftContent %}
 <div>
-  <p>Streaming from {{ user }}'s Spotify</p>
+  <div class="streaming-container">
+    <p>Streaming from {{ user }}'s Spotify</p>
+    <img src="images/gif.gif">
+  </div>
   <a href="/login">Not you?</a>
 </div>
 {% endblock %}
@@ -12,3 +15,7 @@
   {% block artists %}{{ artists }}{% endblock %}
   {% block albumURL %}{{ albumURL }}{% endblock %}
 {% endif %}
+
+{% block error %}
+  {{ error }}
+{% endblock %}

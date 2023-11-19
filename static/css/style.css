@@ -23,7 +23,46 @@ h4 {
   min-height: 100vh;
 }
 
-.spotipi-column {
+@keyframes slideDown {
+  from {
+    top: -100%;
+  }
+  to {
+    top: 0%;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    top: 0%;
+  }
+  to {
+    top: -100%;
+  }
+}
+
+#error {
+  z-index: 1;
+  position: fixed;
+  background-color: white;
+  border: solid black 3px;
+  border-radius: 10px;
+  box-shadow: 4px 4px 0px 0px #000;
+  padding: 10px;
+  max-width: 700px;
+
+  display: none; /* initially set to none */
+  top: -100%;
+  left: 50%;
+  transform: translateX(-50%);
+
+  p {
+    margin: 0;
+  }
+
+}
+
+.column {
   display: flex;
   flex-direction: column;
   flex: 1;
@@ -115,5 +154,17 @@ button {
   svg {
     width: 100%; /* Adjust this value based on your preference */
     height: auto; /* Maintain aspect ratio */
+  }
+}
+
+.streaming-container {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  
+  img {
+    width: 30px;
+    height: auto;
+    transform: rotate(90deg);
   }
 }

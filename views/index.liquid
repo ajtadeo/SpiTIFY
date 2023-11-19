@@ -14,15 +14,16 @@
 
 <body>
     <script src="/socket.io/socket.io.js"></script>
+    <script src="js/index.js"></script>
     <script>
         var socket = io();
     </script>
 
     <div class="spotipi-container">
-        <div class="spotipi-error {% block error %}{% endblock %}">
-            {% block errorMessage %}{% endblock %}
+        <div id="error">
+            <p id="error-message">{% block error %}{% endblock %}</p>
         </div>
-        <div class="spotipi-column">
+        <div class="column">
             <div class="left-container">
                 <div class="left-content">
                     <img src="images/logo.png" class="logo">
@@ -30,10 +31,9 @@
                     {% block leftContent %}{% endblock %}
                 </div>
                 <img src="images/background.svg" class="left-curve">
-                <!-- <div class="left-curve">hi</div> -->
             </div>
         </div>
-        <div class="spotipi-column">
+        <div class="column">
             <div class="right-container">
                 <div class="player-container">
                     <div>

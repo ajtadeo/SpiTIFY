@@ -12,7 +12,7 @@ const { generateRandomString, getEnv } = require("./helpers");
 /* dotenv setup */
 const result = dotenv.config();
 if (result.error) {
-    console.log("Spotipi: Error: dotenv not configured correctly.")
+    console.log("Error: dotenv not configured correctly.")
     throw result.error;
 }
 
@@ -69,8 +69,7 @@ app.get("/dashboard", (req, res) => {
                 // no music currently playing
                 res.render('dashboard', {
                     user: req.cookies['user'],
-                    error: "error",
-                    errorMessage: "Play some music to start!"
+                    error: "Play some music to start!",
                 })
             } else if (response.statusCode == 401) {
                 // bad or expired token
@@ -79,7 +78,7 @@ app.get("/dashboard", (req, res) => {
                 // invalid HTTP code received
                 res.render('dashboard', {
                     user: req.cookies['user'],
-                    error: response.statusCode + ": " + response.body 
+                    error: 'Error: Invalid HTTP code received.'
                 });
             }
         });
@@ -110,8 +109,8 @@ app.get("/callback", (req, res) => {
     var state = req.query.state || null;
     var storedState = req.cookies ? req.cookies[stateKey] : null;
     if (state == null || state !== storedState) {
-        var params = new URLSearchParams({ 'error': 'state_mismatch' });
-        res.redirect('/#?' + params.toString());
+        var params = new URLSearchParams({ 'error': 'Error: State mismatch on callback.' });
+        res.redirect('/?' + params.toString());
     } else {
         // generate token request
         res.clearCookie(stateKey);
@@ -152,14 +151,13 @@ app.get("/callback", (req, res) => {
                         res.cookie("user", body.display_name)
                         res.redirect('/dashboard');
                     } else {
-                        console.log(response.statusCode + ": " + body )
-                        var params = new URLSearchParams({ "error": "could not fetch username" });
-                        res.redirect('/#?' + params.toString());
+                        var params = new URLSearchParams({ "error": "Error: Failed to fetch username from Spotify." });
+                        res.redirect('/?' + params.toString());
                     }
                 })
             } else {
-                var params = new URLSearchParams({ "error": "invalid_token" });
-                res.redirect('/#?' + params.toString());
+                var params = new URLSearchParams({ "error": "Error: Invalid token in callback." });
+                res.redirect('/?' + params.toString());
             }
         });
     }
@@ -188,10 +186,8 @@ app.get("/refresh_token", (req, res) => {
             res.cookie('refresh_token', body.refresh_token)
             res.redirect(next)
         } else {
-            console.error('Token refresh error:', error);
-            console.log('Response:', response.statusCode, response.body);
-            console.log('Request:', authOptions);
-            res.redirect("/");
+            var params = new URLSearchParams({ "error": "Error: Failed to fetch refresh token from Spotify" });
+            res.redirect('/?' + params.toString());
         }
     });
 });
@@ -201,13 +197,13 @@ app.get("/refresh_token", (req, res) => {
 io.on("connection", (socket) => {
     console.log(`User connected`);
 }).on("error", (err) => {
-    console.log("Spotipi: Error: socket.io error, Raspberry Pi not turned on or connected to internet.")
+    console.log("Error: socket.io error, Raspberry Pi not turned on or connected to internet.")
     console.log(err);
 });
 
 server.listen(port, hostname, () => {
     console.log(`App running on ${hostname}:${port}`);
 }).on("error", (err) => {
-    console.log("Spotipi: Error: Express server not configured correctly.")
+    console.log("Error: Express server not configured correctly.")
     console.log(err);
 });
