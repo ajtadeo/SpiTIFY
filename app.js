@@ -1,15 +1,11 @@
-// const { assert, log } = require("console");
 const express = require("express");
 const http = require("http");
 const { Server } = require("socket.io");
 const dotenv = require("dotenv")
 const cookieParser = require('cookie-parser');
 const request = require('request');
-// const { access } = require("fs");
 const { Liquid } = require('liquidjs');
 const { generateRandomString, getEnv } = require("./helpers");
-
-var loggedIn = false;
 
 /* dotenv Setup */
 const result = dotenv.config();
@@ -163,7 +159,6 @@ app.get("/callback", (req, res) => {
             }
         });
     }
-    res.sendFile(__dirname + view);
 });
 
 // refresh access token
