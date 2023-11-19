@@ -9,7 +9,9 @@ const request = require('request');
 const { Liquid } = require('liquidjs');
 const { generateRandomString, getEnv } = require("./helpers");
 
-/* dotenv setup */
+var loggedIn = false;
+
+/* dotenv Setup */
 const result = dotenv.config();
 if (result.error) {
     console.log("Error: dotenv not configured correctly.")
@@ -161,6 +163,7 @@ app.get("/callback", (req, res) => {
             }
         });
     }
+    res.sendFile(__dirname + view);
 });
 
 // refresh access token
@@ -191,7 +194,6 @@ app.get("/refresh_token", (req, res) => {
         }
     });
 });
-
 
 /* Server connection */
 io.on("connection", (socket) => {

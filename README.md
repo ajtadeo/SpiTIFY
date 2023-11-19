@@ -28,10 +28,10 @@ Given a collection of points in D-dimensional space (music preferences, birthday
 1. Login to https://developer.spotify.com/
 2. Create the SpotiPi app
 3. Note the app Client ID and Client Secret
-4. Set the redirect URI to http://[HOSTNAME]:[PORT]/callback/
+4. Set the redirect URI to `http://[RASPBERRY PI IP]:8888/`
 
 ### Express Server on Raspberry Pi
-1. `ssh pi@[HOSTNAME]:[PORT]`
+1. `ssh [RASPBERRY PI IP]`
 2. `git clone https://github.com/ajtadeo/Spotipi.git`
 2. `cd SpotiPi`
 3. `npm i`
@@ -42,14 +42,13 @@ SPOTIFY_CLIENT_ID /* Generated from https://developer.spotify.com/ */
 SPOTIFY_CLIENT_SECRET /* Generated from https://developer.spotify.com/ */
 SPOTIFY_REDIRECT_URI /* http://[HOSTNAME]:[PORT]/callback/ */
 ```
-
-6. `npm start app.js`
+6. `pm2 start app.js`
 
 ### Using the App
-1. Open `[HOSTNAME]:[PORT]` in a web browser
-2. Login with Spotify Credentials
+1. Open `[RASPBERRY PI IP]:8888` in a web browser
 
 ## Resources
 * https://dev.to/bogdaaamn/run-your-nodejs-application-on-a-headless-raspberry-pi-4jnn
 * https://sonyarouje.com/2010/12/17/approach-to-count-dominant-colors-in-a-image/
 * https://tatasz.github.io/dominant_colors/
+* https://dordnung.de/raspberrypi-ledstrip/
