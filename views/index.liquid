@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Alata&family=Calistoga&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <title>Spotipi</title>
+</head>
+
+<body>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="js/index.js"></script>
+    <script>
+        var socket = io();
+    </script>
+
+    <div class="spotipi-container">
+        <div id="error">
+            <p id="error-message">{% block error %}{% endblock %}</p>
+        </div>
+        <div class="column">
+            <div class="left-container">
+                <div class="left-content">
+                    <img src="images/logo.png" class="logo">
+                    <h2>Visualizing the power of music with Raspberry Pi.</h2>
+                    {% block leftContent %}{% endblock %}
+                </div>
+                <img src="images/background.svg" class="left-curve">
+            </div>
+        </div>
+        <div class="column">
+            <div class="right-container">
+                <div class="player-container">
+                    <div>
+                        <h3 class="player-title">{% block title %}-----{% endblock %}</h3>
+                        <h4 class="player-artists">{% block artists %}-----{% endblock %}</h4>
+                    </div>
+                    <img class="player-albumart" src="{% block albumURL %}images/default.png{% endblock %}">
+                </div>
+                <div class="colors-container">
+                    <div class="colors">
+                        {% for i in (1..5) %}
+                        {% if i == 3 %}
+                        <svg height="100" width="100">
+                            <circle cx="50%" cy="50%" r="50%" fill="{{ colors[i] | default: '#D9D9D9' }}" />
+                        </svg>
+                        {% else %}
+                        <svg height="80" width="80">
+                            <circle cx="50%" cy="50%" r="40%" fill="{{ colors[i] | default: '#D9D9D9' }}" />
+                        </svg>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

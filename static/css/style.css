@@ -1,0 +1,170 @@
+body {
+  height: 100%;
+  min-height: 100vh;
+  background-color: #84E998;
+  font-family: 'Alata', sans-serif;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+h3 {
+  font-size: 20px;
+  font-family: 'Calistoga', serif;
+}
+
+h4 {
+  color: #4E4E4E;
+}
+
+.spotipi-container {
+  display: flex;
+  height: 100%;
+  min-height: 100vh;
+}
+
+@keyframes slideDown {
+  from {
+    top: -100%;
+  }
+  to {
+    top: 0%;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    top: 0%;
+  }
+  to {
+    top: -100%;
+  }
+}
+
+#error {
+  z-index: 1;
+  position: fixed;
+  background-color: white;
+  border: solid black 3px;
+  border-radius: 10px;
+  box-shadow: 4px 4px 0px 0px #000;
+  padding: 10px;
+  max-width: 700px;
+
+  display: none; /* initially set to none */
+  top: -100%;
+  left: 50%;
+  transform: translateX(-50%);
+
+  p {
+    margin: 0;
+  }
+
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  justify-content: center;
+}
+
+.left-container {
+  display: flex;
+}
+
+.right-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 40px;  
+}
+
+.left-curve {
+  height: 100vh;
+}
+
+.logo {
+  width: 250px;
+}
+
+.left-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-left: 70px;
+  background-color: #23D865;
+}
+
+button {
+  background-color: black;
+  color: white;
+  border: 3px solid black;
+  padding: 10px 33px;
+  border-radius: 10px;
+  font-family: 'Alata', sans-serif;
+  cursor: pointer;
+}
+
+.player-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: white;
+  border: solid black 3px;
+  border-radius: 10px;
+  box-shadow: 4px 4px 0px 0px #000;
+  padding: 20px 40px 40px 40px;
+  max-width: 400px;
+  gap: 20px;
+
+  .player-artists, .player-title {
+    padding: 0;
+    margin: 0;
+    text-align: center;
+  }
+
+  .player-albumart {
+    border-radius: 10px;
+    width: 363px;
+    height: auto;
+  }
+}
+
+.colors-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: white;
+  border: solid black 3px;
+  border-radius: 10px;
+  box-shadow: 4px 4px 0px 0px #000;
+  padding: 40px;
+  /* margin: 0px 200px; */
+  max-width: 400px;
+  gap: 20px;
+
+  .colors {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  svg {
+    width: 100%; /* Adjust this value based on your preference */
+    height: auto; /* Maintain aspect ratio */
+  }
+}
+
+.streaming-container {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  
+  img {
+    width: 30px;
+    height: auto;
+    transform: rotate(90deg);
+  }
+}

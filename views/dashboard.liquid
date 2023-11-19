@@ -1,0 +1,21 @@
+{% layout "index.liquid" %}
+
+{% block leftContent %}
+<div>
+  <div class="streaming-container">
+    <p>Streaming from {{ user }}'s Spotify</p>
+    <img src="images/gif.gif">
+  </div>
+  <a href="/login">Not you?</a>
+</div>
+{% endblock %}
+
+{% if title and artists and albumURL %}
+  {% block title %}{{ title }}{% endblock %}
+  {% block artists %}{{ artists }}{% endblock %}
+  {% block albumURL %}{{ albumURL }}{% endblock %}
+{% endif %}
+
+{% block error %}
+  {{ error }}
+{% endblock %}
