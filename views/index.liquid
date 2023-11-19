@@ -44,8 +44,8 @@
                 </div>
                 <div class="colors-container">
                     <div class="colors">
-                        {% for i in (1..5) %}
-                        {% if i == 3 %}
+                        {% for i in (0..4) %}
+                        {% if i == 2 %}
                         <svg height="100" width="100">
                             <circle cx="50%" cy="50%" r="50%" fill="{{ colors[i] | default: '#D9D9D9' }}" />
                         </svg>

@@ -6,6 +6,7 @@ const cookieParser = require('cookie-parser');
 const request = require('request');
 const { Liquid } = require('liquidjs');
 const { generateRandomString, getEnv } = require("./helpers");
+const { kmeans } = require("./kmeans")
 
 /* dotenv Setup */
 const result = dotenv.config();
@@ -36,7 +37,14 @@ const io = new Server(server);
 
 // home page
 app.get("/", (req, res) => {
-    res.render('home');
+    var error = req.query.error
+    if (error) {
+        res.render('home', {
+            error: error
+        });
+    } else {
+        res.render('home');
+    }
 });
 
 // dashboard - login required
@@ -54,14 +62,19 @@ app.get("/dashboard", (req, res) => {
                 var albumURL = body.item.album.images[0].url;
                 var title = body.item.name;
                 var artists = body.item.artists.map((artist) => artist.name).join(', ')
-                var progress = body.progress_ms;
-                var duration = body.item.duration_ms;
-                var nextRefresh = duration - progress;
+                var colors = kmeans(albumURL)
+
+                // TODO: refresh page via websocket based on song progress
+                // var progress = body.progress_ms;
+                // var duration = body.item.duration_ms;
+                // var nextRefresh = duration - progress;
+
                 res.render('dashboard', {
                     user: req.cookies['user'],
                     title: title,
                     artists: artists,
-                    albumURL: albumURL
+                    albumURL: albumURL,
+                    colors: colors
                 });
             } else if (response.statusCode == 204) {
                 // no music currently playing
@@ -167,7 +180,7 @@ app.get("/refresh_token", (req, res) => {
     var refresh_token = req.cookies['refresh_token']
     var authOptions = {
         url: 'https://accounts.spotify.com/api/token',
-        headers: { 
+        headers: {
             'content-type': 'application/x-www-form-urlencoded',
             'Authorization': 'Basic ' + Buffer.from(client_id + ':' + client_secret).toString('base64')
         },

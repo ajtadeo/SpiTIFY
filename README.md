@@ -33,16 +33,29 @@ Given a collection of points in D-dimensional space (music preferences, birthday
 ### Express Server on Raspberry Pi
 1. `ssh [RASPBERRY PI IP]`
 2. `git clone https://github.com/ajtadeo/Spotipi.git`
-2. `cd SpotiPi`
-3. `npm i`
-4. `touch .env`
-5. Edit `.env` to include the following variables:
+3. `cd Spotipi`
+4. To use `node-canvas` and perform server-side image analysis, the following requirements must be met.
+   * Node version 16.16.0. Check your node version with `node -v`.
+   * Install the following packages:
+     * MacOS:
+       ```sh
+       brew install pkg-config cairo pango libpng jpeg giflib librsvg 
+       ```
+     * Windows:
+       ```sh
+       sudo apt-get pkg-config cairo pango libpng jpeg giflib librsvg
+       ```
+
+   NOTE: If you get the following error `gyp: Call to 'node -e "require('nan')"' returned exit status 1 while in binding.gyp. while trying to load binding.gyp`, you must install the package nan via `npm i nan` before installing node-canvas.
+5. `npm i`
+6. `touch .env`
+7. Edit `.env` to include the following variables:
 ```
 SPOTIFY_CLIENT_ID /* Generated from https://developer.spotify.com/ */
 SPOTIFY_CLIENT_SECRET /* Generated from https://developer.spotify.com/ */
 SPOTIFY_REDIRECT_URI /* http://[HOSTNAME]:[PORT]/callback/ */
-```
-6. `pm2 start app.js`
+``` 
+8. `pm2 start app.js`
 
 ### Using the App
 1. Open `[RASPBERRY PI IP]:8888` in a web browser

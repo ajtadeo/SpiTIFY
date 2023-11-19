@@ -1,3 +1,4 @@
+// ERROR MODAL ANIMATION
 document.addEventListener('DOMContentLoaded', function () {
   var error = document.getElementById('error')
   var errorMessage = document.getElementById('error-message')
