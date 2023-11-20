@@ -22,7 +22,7 @@ async function kmeans(albumURL) {
   // ...
   const pixelData = imageData.data;
 
-  console.log(pixelData)
+  // console.log(pixelData)
   return colors
 }
 

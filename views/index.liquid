@@ -13,11 +13,7 @@
 </head>
 
 <body>
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="js/index.js"></script>
-    <script>
-        var socket = io();
-    </script>
+    <script src="js/index.js" type="module"></script>
 
     <div class="spotipi-container">
         <div id="error">
@@ -37,21 +33,21 @@
             <div class="right-container">
                 <div class="player-container">
                     <div>
-                        <h3 class="player-title">{% block title %}-----{% endblock %}</h3>
-                        <h4 class="player-artists">{% block artists %}-----{% endblock %}</h4>
+                        <h3 id="player-title">{% block title %}-----{% endblock %}</h3>
+                        <h4 id="player-artists">{% block artists %}-----{% endblock %}</h4>
                     </div>
-                    <img class="player-albumart" src="{% block albumURL %}images/default.png{% endblock %}">
+                    <img id="player-albumart" src="{% block albumURL %}images/default.png{% endblock %}">
                 </div>
                 <div class="colors-container">
                     <div class="colors">
                         {% for i in (0..4) %}
                         {% if i == 2 %}
                         <svg height="100" width="100">
-                            <circle cx="50%" cy="50%" r="50%" fill="{{ colors[i] | default: '#D9D9D9' }}" />
+                            <circle id="color{{i}}" cx="50%" cy="50%" r="50%" fill="{{ colors[i] | default: '#D9D9D9' }}" />
                         </svg>
                         {% else %}
                         <svg height="80" width="80">
-                            <circle cx="50%" cy="50%" r="40%" fill="{{ colors[i] | default: '#D9D9D9' }}" />
+                            <circle id="color{{i}}" cx="50%" cy="50%" r="40%" fill="{{ colors[i] | default: '#D9D9D9' }}" />
                         </svg>
                         {% endif %}
                         {% endfor %}

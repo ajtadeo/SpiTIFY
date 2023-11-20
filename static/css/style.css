@@ -119,13 +119,13 @@ button {
   max-width: 400px;
   gap: 20px;
 
-  .player-artists, .player-title {
+  #player-artists, #player-title {
     padding: 0;
     margin: 0;
     text-align: center;
   }
 
-  .player-albumart {
+  #player-albumart {
     border-radius: 10px;
     width: 363px;
     height: auto;
