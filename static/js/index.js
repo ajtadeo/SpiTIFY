@@ -15,7 +15,7 @@ socket.on("connect", () => {
   })
 
   socket.on("refreshToken", () => {
-    window.location.href = "/auth/refresh_token?next=/dashboard";
+    window.location.href = "/auth/refresh_token";
   })
 
   socket.on("exceededDataRate", () => {

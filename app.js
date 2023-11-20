@@ -111,7 +111,8 @@ app.get("/dashboard", (req, res) => {
             user: req.session.user,
         });
     } else {
-        res.redirect('/')
+        var params = new URLSearchParams({ "error": "Error: Login required." });
+        res.redirect('/?' + params.toString())
     }
 })
 
@@ -167,7 +168,7 @@ app.get("/auth/callback", (req, res) => {
                     headers: { 'Authorization': 'Bearer ' + body.access_token },
                     json: true
                 };
-                
+
                 request.get(userOptions, (error, response, body) => {
                     if (!error && response.statusCode == 200) {
                         req.session.user = body.display_name
@@ -193,35 +194,39 @@ app.get("/auth/callback", (req, res) => {
 
 // refresh access token
 app.get("/auth/refresh_token", (req, res) => {
-    var next = req.query.next
-    var refresh_token = req.session.refresh_token
-    var authOptions = {
-        url: 'https://accounts.spotify.com/api/token',
-        headers: {
-            'content-type': 'application/x-www-form-urlencoded',
-            'Authorization': 'Basic ' + Buffer.from(CLIENT_ID + ':' + CLIENT_SECRET).toString('base64')
-        },
-        form: {
-            grant_type: 'refresh_token',
-            refresh_token: refresh_token
-        },
-        json: true
-    };
+    if (req.session.user) {
+        var refresh_token = req.session.refresh_token
+        var authOptions = {
+            url: 'https://accounts.spotify.com/api/token',
+            headers: {
+                'content-type': 'application/x-www-form-urlencoded',
+                'Authorization': 'Basic ' + Buffer.from(CLIENT_ID + ':' + CLIENT_SECRET).toString('base64')
+            },
+            form: {
+                grant_type: 'refresh_token',
+                refresh_token: refresh_token
+            },
+            json: true
+        };
 
-    request.post(authOptions, (error, response, body) => {
-        if (!error && response.statusCode == 200) {
-            const cookieAttributes = {
-                httpOnly: true,
-                secure: true,
+        request.post(authOptions, (error, response, body) => {
+            if (!error && response.statusCode == 200) {
+                const cookieAttributes = {
+                    httpOnly: true,
+                    secure: true,
+                }
+                req.session.access_token = body.access_token
+                req.session.refresh_token = body.refresh_token
+                res.redirect(next)
+            } else {
+                var params = new URLSearchParams({ "error": "Error: Failed to fetch refresh token from Spotify" });
+                res.redirect('/?' + params.toString());
             }
-            req.session.access_token = body.access_token
-            req.session.refresh_token = body.refresh_token
-            res.redirect(next)
-        } else {
-            var params = new URLSearchParams({ "error": "Error: Failed to fetch refresh token from Spotify" });
-            res.redirect('/?' + params.toString());
-        }
-    });
+        });
+    } else {
+        var params = new URLSearchParams({ "error": "Error: Login required." });
+        res.redirect('/?' + params.toString())
+    }
 });
 
 /* Express Server connection */
