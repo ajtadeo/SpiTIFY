@@ -38,6 +38,7 @@
     "node-canvas": "^2.9.0",
     "nopt": "^1.0.10",
     "normalize-path": "^3.0.0",
+    "pg-promise": "^11.5.4",
     "picomatch": "^2.3.1",
     "pstree.remy": "^1.1.8",
     "readdirp": "^3.6.0",

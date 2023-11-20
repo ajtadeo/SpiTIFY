@@ -9,6 +9,7 @@ const { generateRandomString, getEnv } = require("./helpers");
 const { kmeans } = require("./kmeans");
 const { exit } = require("process");
 var session = require("express-session")
+const pgp = require('pg-promise')
 
 /* dotenv Setup */
 const result = dotenv.config();
@@ -23,6 +24,9 @@ const CLIENT_ID = getEnv("SPOTIFY_CLIENT_ID");
 const REDIRECT_URI = getEnv("SPOTIFY_REDIRECT_URI");
 const CLIENT_SECRET = getEnv("SPOTIFY_CLIENT_SECRET");
 const SESSION_SECRET = getEnv("SESSION_SECRET")
+const POSTGRES_USERNAME = getEnv("POSTGRES_USERNAME")
+const POSTGRES_PASSWORD = getEnv("POSTGRES_PASSWORD")
+const POSTGRES_DB = getEnv("POSTGRES_DB")
 var stateKey = 'spotify_auth_state';
 
 /* Express.js setup with socket.io and LiquidJS templating */
@@ -45,6 +49,9 @@ app.use(session({
 const server = createServer(app);
 const io = new Server(server);
 
+// const db = pgp("postgres://" + POSTGRES_USERNAME + ":" + POSTGRES_PASSWORD + "@" + HOSTNAME + ":" + PORT + "/" + POSTGRES_DB)
+var currentAlbum = ''
+
 function fetchCurrentlyPlaying(socket, access_token) {
     var currently_playing_params = {
         url: 'https://api.spotify.com/v1/me/player/currently-playing',
@@ -52,15 +59,30 @@ function fetchCurrentlyPlaying(socket, access_token) {
         json: true
     };
 
-    request.get(currently_playing_params, (error, response, body) => {
+    request.get(currently_playing_params, async (error, response, body) => {
         if (response.statusCode == 200) {
             // music currently playing
             var albumURL = body.item.album.images[0].url;
             var title = body.item.name;
             var artists = body.item.artists.map((artist) => artist.name).join(', ')
-            var colors = kmeans(albumURL)
-
-            socket.emit("currentlyPlaying", title, artists, albumURL, colors)
+            var albumID = body.item.album.id
+            // db.one('SELECT * FROM albums WHERE albumID = $1', albumID)
+            //     .then(result => {
+            //         console.log("row exists")
+            //     })
+            //     .catch(error => {
+            //         console.log("row doesnt exist")
+            //     })
+            if (currentAlbum !== body.item.album.id) {
+                // only run kmeans on new album images
+                currentAlbum = body.item.album.id;
+                try {
+                    var colors = await kmeans(albumURL)
+                    socket.emit("currentlyPlaying", title, artists, albumURL, colors)
+                } catch (error) {
+                    socket.emit("error", "Error: Async function kmeans failed: " + error)
+                }
+            }
         } else if (response.statusCode == 401) {
             // bad or expired token
             socket.emit('refreshToken')
@@ -69,8 +91,7 @@ function fetchCurrentlyPlaying(socket, access_token) {
             socket.emit('exceededDataRate')
         } else if (response.statusCode != 204) {
             // invalid HTTP code received
-            console.log("Error: Invalid HTTP code received " + response.statusCode)
-            exit
+            socket.emit("error", "Error: invalid HTTP code received" + response.statusCode)
         }
     });
 }

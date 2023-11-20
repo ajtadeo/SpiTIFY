@@ -11,6 +11,7 @@ socket.on("connect", () => {
     document.getElementById("player-albumart").setAttribute("src", albumURL)
     for (var i = 0; i < 5; i++){
       document.getElementById("color" + i).setAttribute("fill", colors[i])
+      console.log(document.getElementById("color" + i))
     }
   })
 
@@ -18,8 +19,8 @@ socket.on("connect", () => {
     window.location.href = "/auth/refresh_token";
   })
 
-  socket.on("exceededDataRate", () => {
-    document.getElementById("error").innerHTML = "Spotipi exceeded Spotify API data rate."
+  socket.on("error", (msg) => {
+    document.getElementById("error").innerHTML = msg
   })
 })
 
