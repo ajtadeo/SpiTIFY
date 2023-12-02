@@ -35,12 +35,12 @@ This database stores the results of the kmeans algorithm for a given Spotify alb
 1. Download PostgreSQL from https://www.postgresql.org/download/
 2. Open Postgres. There should be 3 default databases, [root name], postgres, and template0. Double click `[root name]` or run `psql -p5432 "[root name]"` in the terminal.
 3. Create the `spotipi` database.
-  ```
+  ```sql
   CREATE DATABASE spotipi;
   ```
 4. Exit out of `[root name]` by running `\quit`. Open the newly create database by double clicking `spotipi` in Postgres or running  `psql -p5432 spotipi` in the terminal.
 5. Create the table `colors`.
-  ```
+  ```sql
   CREATE TABLE colors (
      albumID VARCHAR(255) UNIQUE,
      colors VARCHAR(255)[]
@@ -68,10 +68,10 @@ This database stores the results of the kmeans algorithm for a given Spotify alb
 5. `npm i`
 6. `touch .env`
 7. Edit `.env` to include the following variables:
-```env
-SPOTIFY_CLIENT_ID /* Generated from https://developer.spotify.com/ */
-SPOTIFY_CLIENT_SECRET /* Generated from https://developer.spotify.com/ */
-SPOTIFY_REDIRECT_URI /* http://[HOSTNAME]:[PORT]/auth/callback/ */
+```js
+SPOTIFY_CLIENT_ID="s3cret" /* Generated from https://developer.spotify.com/ */
+SPOTIFY_CLIENT_SECRET="s3cret" /* Generated from https://developer.spotify.com/ */
+SPOTIFY_REDIRECT_URI="http://[HOSTNAME]:[PORT]/auth/callback/"
 SESSION_SECRET="s3cret"
 PGUSER="root" /* machine's currently logged in user */
 PGPASSWORD="root password" /* machine's currently logged in user password */
