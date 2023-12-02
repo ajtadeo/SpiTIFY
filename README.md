@@ -5,7 +5,9 @@ This program uses Spotify API and websockets to control Raspberry Pi and display
 ### Tech Stack
 * Node
 * Express.js
+* PostgreSQL
 * Liquid.js
+* socket.io
 * Spotify API
 * Raspberry Pi
 
@@ -15,13 +17,14 @@ A K-Means Clustering algorithm was implemented to determine the k dominant color
 
 Given a collection of points in D-dimensional space (music preferences, birthday, etc.), natural clusters form. Such is the case with dominant colors in an image. Clustering can be applied to a weighted graph G=(V,E) where each cluster has a distance from another cluster $d_{ij}$. To determine a clustering of points that maximizes the distance between clusters such that the distance among points in those clusters are minimized, the following algorithm is used:
 
-1. Convert the image into a 2D array of RGB values.
+1. Convert the image into a 2D array of [LAB](https://en.wikipedia.org/wiki/CIELAB_color_space) values.
 2. At random, select k points from the 2D array which are the k centroids.
 3. For each point p in the array:
    1. Determine the Euclidean distance from p to each centroid.
    2. Add the point p to the centroid cluster with the minimum Euclidean distance.
-4. Determine the mean of each of the k clusters, these are the new centroids.
-5. If the new centroids = old centroids, return the resulting cluster. Else, repeat 3.
+4. If more than 2 of the resulting clusters have length 0 (i.e. when the album art has very little color variation), restart kmeans to pick new random centroids. Else, replace clusters of length 0 with the cluster of max length to avoid recursing for a long period of time.
+5. Determine the mean of each of the k clusters, these are the new centroids.
+6. If the new centroids = old centroids, return the resulting cluster. Else, repeat from step 3.
 
 ## Setup
 ### Spotify API
@@ -90,3 +93,4 @@ PGPORT="5432"
 * https://sonyarouje.com/2010/12/17/approach-to-count-dominant-colors-in-a-image/
 * https://tatasz.github.io/dominant_colors/
 * https://dordnung.de/raspberrypi-ledstrip/
+* https://towardsdatascience.com/extracting-colours-from-an-image-using-k-means-clustering-9616348712be

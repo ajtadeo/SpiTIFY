@@ -128,6 +128,23 @@ async function kmeans(albumURL) {
       clusters[minIndex].push(pixelDataLAB[i])
     }
 
+    // check for empty clusters
+    if (clusters.some(x => x.length == 0)) {
+      var numEmpty = clusters.filter(x => x.length == 0).length
+      if (numEmpty > 2) {
+        console.log('More then three empty clusters found. Restarting k-means.');
+        return kmeans(albumURL);
+      } else {
+        const maxLengthIndex = clusters.reduce((maxIndex, arr, currentIndex, array) => {
+          return arr.length > array[maxIndex].length ? currentIndex : maxIndex;
+        }, 0);
+
+        const maxCluster = [...clusters[maxLengthIndex]];
+        const newClusters = clusters.map(arr => (arr.length === 0 ? maxCluster : arr));
+        clusters = newClusters
+      }
+    }
+
     // push the mean of each cluster to new centroids
     for (var i = 0; i < 5; i++) {
       var mean = []

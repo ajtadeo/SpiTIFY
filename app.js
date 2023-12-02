@@ -71,11 +71,7 @@ async function fetchColors(albumID, albumURL) {
             await client.query('INSERT INTO colors (albumID, colors) VALUES ($1, $2)', [albumID, colors])
         }
     } catch (err) {
-        if (err.code === 'ECONNRESET') {
-            console.error('Connection reset by peer. Check network and server status.');
-        } else {
-            console.error(err)
-        }
+        console.error(err)
     }
     return colors
 }
