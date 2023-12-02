@@ -25,10 +25,28 @@ Given a collection of points in D-dimensional space (music preferences, birthday
 
 ## Setup
 ### Spotify API
-1. Login to https://developer.spotify.com/
+1. Create an account and login to https://developer.spotify.com/
 2. Create the SpotiPi app
 3. Note the app Client ID and Client Secret
 4. Set the redirect URI to `http://[RASPBERRY PI IP]:8888/`
+
+### PostgreSQL Database
+This database stores the results of the kmeans algorithm for a given Spotify albumID to avoid recalculations in the future.
+1. Download PostgreSQL from https://www.postgresql.org/download/
+2. Open Postgres. There should be 3 default databases, [root name], postgres, and template0. Double click `[root name]` or run `psql -p5432 "[root name]"` in the terminal.
+3. Create the `spotipi` database.
+  ```
+  CREATE DATABASE spotipi;
+  ```
+4. Exit out of `[root name]` by running `\quit`. Open the newly create database by double clicking `spotipi` in Postgres or running  `psql -p5432 spotipi` in the terminal.
+5. Create the table `colors`.
+  ```
+  CREATE TABLE colors (
+     albumID VARCHAR(255) UNIQUE,
+     colors VARCHAR(255)[]
+   );
+  ```
+6. Exit using `\quit`
 
 ### Express Server on Raspberry Pi
 1. `ssh [RASPBERRY PI IP]`
@@ -50,11 +68,18 @@ Given a collection of points in D-dimensional space (music preferences, birthday
 5. `npm i`
 6. `touch .env`
 7. Edit `.env` to include the following variables:
-```
+```env
 SPOTIFY_CLIENT_ID /* Generated from https://developer.spotify.com/ */
 SPOTIFY_CLIENT_SECRET /* Generated from https://developer.spotify.com/ */
-SPOTIFY_REDIRECT_URI /* http://[HOSTNAME]:[PORT]/callback/ */
+SPOTIFY_REDIRECT_URI /* http://[HOSTNAME]:[PORT]/auth/callback/ */
+SESSION_SECRET="s3cret"
+PGUSER="root" /* machine's currently logged in user */
+PGPASSWORD="root password" /* machine's currently logged in user password */
+PGDATABASE="spotipi"
+PGHOST="localhost"
+PGPORT="5432"
 ``` 
+8. Open Postgres.
 8. `pm2 start app.js`
 
 ### Using the App
