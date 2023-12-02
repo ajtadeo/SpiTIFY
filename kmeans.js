@@ -1,4 +1,5 @@
 const { createCanvas, loadImage } = require('node-canvas')
+const MAX_ITERS = 50;
 
 // HELPER FUNCTIONS
 function RGBAToLAB(rgba) {
@@ -26,7 +27,7 @@ function RGBAToLAB(rgba) {
 
 function LABtoRGBA(lab) {
   // https://github.com/antimatter15/rgb-lab
-  // since album art is a jpg, a = 255 for all pixels.
+  // since album art is a jpg, a = 1 for all pixels.
   var y = (lab[0] + 16) / 116,
     x = lab[1] / 500 + y,
     z = y - lab[2] / 200,
@@ -74,11 +75,13 @@ function deltaE(labA, labB) {
 
 // KMEANS ALGORITHM
 async function kmeans(albumURL) {
+  const start = performance.now()
+  console.log("Running kmeans on " + albumURL)
   var image = await loadImage(albumURL)
   var width = image.width
   var height = image.height
 
-  // draw image to server-side canvas and get pixel data
+  // draw image to server-side canvas and get RGBA pixel data
   const canvas = createCanvas(width, height);
   const ctx = canvas.getContext('2d');
   ctx.drawImage(image, 0, 0, width, height);
@@ -98,42 +101,61 @@ async function kmeans(albumURL) {
   }
 
   // select k random pixels
-  var oldCentroids = []
+  var centroids = []
   for (var i = 0; i < 5; i++) {
     while (true) {
       var random = Math.floor(Math.random() * pixelDataLAB.length)
-      if (oldCentroids.includes(pixelDataLAB[random]) === false) {
-        oldCentroids.push(pixelDataLAB[random])
+      if (centroids.includes(pixelDataLAB[random]) === false) {
+        centroids.push(pixelDataLAB[random])
         break
       }
     }
   }
 
   // repeat until centroids no longer change
-  // var centroids = []
-  // while (centroids != oldCentroids) {
-  //   // for each point, determine euclidean distance to each centroid and add it to the closest centroid cluster
-  //   var clusters = [[], [], [], [], []]
-  //   for (var i = 0; i < pixelDataLAB.length; i++) {
-  //     var distances = []
-  //     for (var j = 0; j < 5; j++) {
-  //       distances.push(deltaE(pixelDataLAB[i], centroids[j]))
-  //     }
-  //     var minIndex = distances.indexOf(Math.min(...distances))
-  //     clusters[minIndex].push(distances[minIndex])
-  //   }
+  var newCentroids = []
+  var iters = 0
+  while (true) {
+    // for each point, determine euclidean distance to each centroid and add it to the closest centroid cluster
+    iters++
+    var clusters = [[], [], [], [], []]
+    for (var i = 0; i < pixelDataLAB.length; i++) {
+      var distances = []
+      for (var j = 0; j < 5; j++) {
+        distances.push(deltaE(pixelDataLAB[i], centroids[j]))
+      }
+      var minIndex = distances.indexOf(Math.min(...distances))
+      clusters[minIndex].push(pixelDataLAB[i])
+    }
 
-  //   // determine mean of each cluster
-  //   // TODO: determine mean of cluster arrays
-  // }
+    // push the mean of each cluster to new centroids
+    for (var i = 0; i < 5; i++) {
+      var mean = []
+      // find mean of LAB values
+      for (var j = 0; j < 3; j++) {
+        var values = clusters[i].map((x) => x[j])
+        mean.push(values.reduce((acc, val) => acc + val, 0) / values.length)
+      }
+      newCentroids.push(mean)
+    }
+
+    if (iters === MAX_ITERS || JSON.stringify(newCentroids) === JSON.stringify(centroids)) {
+      break;
+    } else {
+      centroids = newCentroids
+      newCentroids = []
+    }
+  }
 
   // convert LAB to RGBA strings for CSS attribute
   var result = []
   for (var i = 0; i < 5; i++) {
-    var rgba = LABtoRGBA(oldCentroids[i])
+    var rgba = LABtoRGBA(centroids[i])
     result.push("rgba(" + rgba.join(", ") + ")")
   }
 
+  const end = performance.now()
+  console.log("Time elapsed: " + (end - start) + "ms")
   return result
 }
 

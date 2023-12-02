@@ -9,7 +9,7 @@ const { generateRandomString, getEnv } = require("./helpers");
 const { kmeans } = require("./kmeans");
 const { exit } = require("process");
 var session = require("express-session")
-const pgp = require('pg-promise')
+const { Client } = require('pg')
 
 /* dotenv Setup */
 const result = dotenv.config();
@@ -24,9 +24,6 @@ const CLIENT_ID = getEnv("SPOTIFY_CLIENT_ID");
 const REDIRECT_URI = getEnv("SPOTIFY_REDIRECT_URI");
 const CLIENT_SECRET = getEnv("SPOTIFY_CLIENT_SECRET");
 const SESSION_SECRET = getEnv("SESSION_SECRET")
-const POSTGRES_USERNAME = getEnv("POSTGRES_USERNAME")
-const POSTGRES_PASSWORD = getEnv("POSTGRES_PASSWORD")
-const POSTGRES_DB = getEnv("POSTGRES_DB")
 var stateKey = 'spotify_auth_state';
 
 /* Express.js setup with socket.io and LiquidJS templating */
@@ -37,7 +34,7 @@ app.set("views", __dirname + "/views");
 app.set("view engine", "liquid");
 app.use(express.static(__dirname + "/static"))
 app.use(cookieParser());
-app.use(session({
+const sessionMiddleware = session({
     secret: SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
@@ -45,12 +42,43 @@ app.use(session({
         httpOnly: true,
         // secure: true
     }
-}))
+})
+app.use(sessionMiddleware)
 const server = createServer(app);
 const io = new Server(server);
+io.engine.use(sessionMiddleware);
 
-// const db = pgp("postgres://" + POSTGRES_USERNAME + ":" + POSTGRES_PASSWORD + "@" + HOSTNAME + ":" + PORT + "/" + POSTGRES_DB)
-var currentAlbum = ''
+/* Connect to Postgres DB */
+// connection information is provided with .env variables
+const client = new Client();
+client.connect()
+    .then(() => {
+        console.log("Connected to PostgreSQL database")
+    })
+    .catch((err) => {
+        console.error(err)
+        process.exit(1)
+    })
+
+async function fetchColors(albumID, albumURL) {
+    var colors = ['#D9D9D9', '#D9D9D9', '#D9D9D9', '#D9D9D9', '#D9D9D9']
+    try {
+        const res = await client.query('SELECT * FROM colors WHERE albumID = $1 LIMIT 1;', [albumID])
+        if (res.rows.length > 0) {
+            colors = res.rows[0].colors
+        } else {
+            colors = await kmeans(albumURL)
+            await client.query('INSERT INTO colors (albumID, colors) VALUES ($1, $2)', [albumID, colors])
+        }
+    } catch (err) {
+        if (err.code === 'ECONNRESET') {
+            console.error('Connection reset by peer. Check network and server status.');
+        } else {
+            console.error(err)
+        }
+    }
+    return colors
+}
 
 function fetchCurrentlyPlaying(socket, access_token) {
     var currently_playing_params = {
@@ -60,35 +88,27 @@ function fetchCurrentlyPlaying(socket, access_token) {
     };
 
     request.get(currently_playing_params, async (error, response, body) => {
-        if (response.statusCode == 200) {
-            // music currently playing
+        if (error) {
+            console.log(error)
+            socket.emit('error', 'Error: Invalid response from Spotify: ' + error)
+        } else if (response.statusCode == 200) {
+            // response OK
             var albumURL = body.item.album.images[0].url;
             var title = body.item.name;
             var artists = body.item.artists.map((artist) => artist.name).join(', ')
             var albumID = body.item.album.id
-            // db.one('SELECT * FROM albums WHERE albumID = $1', albumID)
-            //     .then(result => {
-            //         console.log("row exists")
-            //     })
-            //     .catch(error => {
-            //         console.log("row doesnt exist")
-            //     })
-            if (currentAlbum !== body.item.album.id) {
-                // only run kmeans on new album images
-                currentAlbum = body.item.album.id;
-                try {
-                    var colors = await kmeans(albumURL)
-                    socket.emit("currentlyPlaying", title, artists, albumURL, colors)
-                } catch (error) {
-                    socket.emit("error", "Error: Async function kmeans failed: " + error)
-                }
+            try {
+                var colors = await fetchColors(albumID, albumURL)
+                socket.emit("currentlyPlaying", title, artists, albumURL, colors)
+            } catch (error) {
+                socket.emit("error", "Error: Async function kmeans failed: " + error)
             }
         } else if (response.statusCode == 401) {
             // bad or expired token
             socket.emit('refreshToken')
         } else if (response.statusCode == 429) {
             // exceeded data rate
-            socket.emit('exceededDataRate')
+            socket.emit('error', "Error: Spotipi exceeded Spotify API data rate.")
         } else if (response.statusCode != 204) {
             // invalid HTTP code received
             socket.emit("error", "Error: invalid HTTP code received" + response.statusCode)
@@ -111,23 +131,6 @@ app.get("/", (req, res) => {
 // dashboard - login required
 app.get("/dashboard", (req, res) => {
     if (req.session.user) {
-        io.on("connection", (socket) => {
-            console.log("socket.io server connected");
-
-            fetchCurrentlyPlaying(socket, req.session.access_token); // initial fetch
-            const intervalId = setInterval(() => {
-                fetchCurrentlyPlaying(socket, req.session.access_token);
-            }, 5000);
-
-            socket.on('disconnect', () => {
-                console.log('Client disconnected');
-                clearInterval(intervalId);
-            });
-        }).on("error", (err) => {
-            console.log("Error: Failed to connect to websocket, Raspberry Pi not turned on or connected to internet.")
-            console.log(err);
-        });
-
         res.render('dashboard', {
             user: req.session.user,
         });
@@ -248,6 +251,34 @@ app.get("/auth/refresh_token", (req, res) => {
         var params = new URLSearchParams({ "error": "Error: Login required." });
         res.redirect('/?' + params.toString())
     }
+});
+
+/* Cleanup PostgreSQL connection */
+process.on('SIGINT', async () => {
+    console.log("Disconnecting from PostgreSQL database")
+    await client.end()
+    process.exit(0)
+})
+
+/* Websocket connection */
+io.on("connection", (socket) => {
+    console.log("* socket.io client " + socket.id + " connected");
+
+    var session = socket.request.session
+    if (session) {
+        fetchCurrentlyPlaying(socket, session.access_token); // initial fetch
+        const intervalId = setInterval(() => {
+            fetchCurrentlyPlaying(socket, session.access_token);
+        }, 5000);
+
+        socket.on('disconnect', () => {
+            console.log('* socket.io client ' + socket.id + ' disconnected');
+            clearInterval(intervalId);
+        });
+    }
+}).on("error", (err) => {
+    console.log("Error: Failed to connect to websocket, Raspberry Pi not turned on or connected to internet.")
+    console.log(err);
 });
 
 /* Express Server connection */
